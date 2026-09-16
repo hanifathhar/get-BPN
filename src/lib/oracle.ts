@@ -1,5 +1,6 @@
 import oracledb from "oracledb";
 import path from "path";
+import fs from "fs";
 
 // Inisialisasi Oracle Thick Client
 let isOracleClientInitialized = false;
@@ -14,12 +15,21 @@ export function ensureOracleClient() {
         }
         oracledb.initOracleClient({ libDir });
       } else {
-        // Linux / Unix environment
-        const linuxClientDir = process.env.ORACLE_CLIENT_DIR || process.env.LD_LIBRARY_PATH;
-        if (linuxClientDir) {
-          oracledb.initOracleClient({ libDir: linuxClientDir.split(":")[0] });
+        // Linux / Unix environment: cari direktori Oracle Instant Client
+        const candidateDirs = [
+          process.env.ORACLE_CLIENT_DIR,
+          "/opt/oracle/instantclient_19_23",
+          "/opt/oracle/instantclient_21_13",
+          "/opt/oracle/instantclient",
+          "/usr/lib/oracle/19.23/client64/lib",
+          "/usr/lib/oracle/21/client64/lib",
+        ].filter(Boolean) as string[];
+
+        const foundDir = candidateDirs.find((dir) => fs.existsSync(dir));
+        if (foundDir) {
+          oracledb.initOracleClient({ libDir: foundDir });
         } else {
-          // Default system search paths (/usr/lib, /opt/oracle, etc.)
+          // Coba inisialisasi default sistem (LD_LIBRARY_PATH / ldconfig)
           oracledb.initOracleClient();
         }
       }

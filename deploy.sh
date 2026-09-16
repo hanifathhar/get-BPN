@@ -21,12 +21,31 @@ echo -e "${CYAN}======================================================${NC}"
 echo -e "${CYAN}   🚀 MEMULAI DEPLOYMENT APLIKASI GET-BPN (PORT 3005)  ${NC}"
 echo -e "${CYAN}======================================================${NC}"
 
-# 1. Cek & Pasang Dependensi Sistem untuk Oracle Client (jika di Linux Ubuntu/Debian)
-if [ -f /etc/debian_version ]; then
-  echo -e "\n${YELLOW}[1/7] Memeriksa dependensi sistem Linux (libaio)...${NC}"
-  if ! dpkg -s libaio1 >/dev/null 2>&1 && ! dpkg -s libaio1t64 >/dev/null 2>&1; then
-    echo "Menginstall libaio untuk Oracle Client..."
-    sudo apt-get update -y && (sudo apt-get install -y libaio1 2>/dev/null || sudo apt-get install -y libaio1t64 2>/dev/null || true)
+# 1. Cek & Pasang Dependensi Sistem untuk Oracle Client (Linux)
+if [ "$(uname)" = "Linux" ]; then
+  echo -e "\n${YELLOW}[1/7] Memeriksa Oracle Instant Client & dependensi sistem Linux...${NC}"
+  if [ -f /etc/debian_version ]; then
+    sudo apt-get update -y
+    sudo apt-get install -y libaio1 2>/dev/null || sudo apt-get install -y libaio1t64 2>/dev/null || true
+    sudo apt-get install -y wget unzip 2>/dev/null || true
+  fi
+
+  # Unduh & Pasang Oracle Instant Client Linux x64 jika belum ada
+  if [ ! -d "/opt/oracle/instantclient_19_23" ] && [ ! -d "/opt/oracle/instantclient" ]; then
+    echo "Mengunduh dan memasang Oracle Instant Client 19.23 Linux x64..."
+    sudo mkdir -p /opt/oracle
+    cd /opt/oracle
+    sudo wget -q --show-progress https://download.oracle.com/otn_software/linux/instantclient/1923000/instantclient-basic-linux.x64-19.23.0.0.0dbru.zip -O instantclient-basic.zip
+    sudo unzip -q -o instantclient-basic.zip
+    sudo rm -f instantclient-basic.zip
+    
+    # Daftarkan library ke ldconfig
+    echo "/opt/oracle/instantclient_19_23" | sudo tee /etc/ld.so.conf.d/oracle-instantclient.conf > /dev/null
+    sudo ldconfig 2>/dev/null || true
+    echo -e "${GREEN}Oracle Instant Client berhasil dipasang di /opt/oracle/instantclient_19_23.${NC}"
+    cd "$APP_DIR"
+  else
+    echo -e "${GREEN}Oracle Instant Client Linux sudah terpasang.${NC}"
   fi
 fi
 
