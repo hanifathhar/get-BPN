@@ -7,18 +7,29 @@ let isOracleClientInitialized = false;
 export function ensureOracleClient() {
   if (!isOracleClientInitialized) {
     try {
-      const libDir = path.resolve(process.cwd(), "oracle_client", "instantclient_19_23");
-      if (!process.env.PATH?.includes(libDir)) {
-        process.env.PATH = `${libDir};${process.env.PATH}`;
+      if (process.platform === "win32") {
+        const libDir = path.resolve(process.cwd(), "oracle_client", "instantclient_19_23");
+        if (!process.env.PATH?.includes(libDir)) {
+          process.env.PATH = `${libDir};${process.env.PATH}`;
+        }
+        oracledb.initOracleClient({ libDir });
+      } else {
+        // Linux / Unix environment
+        const linuxClientDir = process.env.ORACLE_CLIENT_DIR || process.env.LD_LIBRARY_PATH;
+        if (linuxClientDir) {
+          oracledb.initOracleClient({ libDir: linuxClientDir.split(":")[0] });
+        } else {
+          // Default system search paths (/usr/lib, /opt/oracle, etc.)
+          oracledb.initOracleClient();
+        }
       }
-      oracledb.initOracleClient({ libDir });
       isOracleClientInitialized = true;
     } catch (err: any) {
       // Abaikan jika sudah diinisialisasi sebelumnya
       if (err.message && (err.message.includes("already been initialized") || err.message.includes("NJS-077"))) {
         isOracleClientInitialized = true;
       } else {
-        console.error("Oracle client initialization error:", err.message);
+        console.warn("Oracle client initialization note:", err.message);
       }
     }
   }
