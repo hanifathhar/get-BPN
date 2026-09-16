@@ -28,6 +28,11 @@ if [ "$(uname)" = "Linux" ]; then
     sudo apt-get update -y
     sudo apt-get install -y libaio1 2>/dev/null || sudo apt-get install -y libaio1t64 2>/dev/null || true
     sudo apt-get install -y wget unzip 2>/dev/null || true
+    
+    # Fix libaio.so.1 symlink untuk Ubuntu 24.04 / Debian modern jika menggunakan libaio1t64
+    if [ -f /usr/lib/x86_64-linux-gnu/libaio.so.1t64 ] && [ ! -f /usr/lib/x86_64-linux-gnu/libaio.so.1 ]; then
+      sudo ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+    fi
   fi
 
   # Unduh & Pasang Oracle Instant Client Linux x64 jika belum ada
