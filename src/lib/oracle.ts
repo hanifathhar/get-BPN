@@ -5,45 +5,73 @@ import fs from "fs";
 // Inisialisasi Oracle Thick Client
 let isOracleClientInitialized = false;
 
+
 export function ensureOracleClient() {
   if (!isOracleClientInitialized) {
     try {
       if (process.platform === "win32") {
-        const libDir = path.resolve(process.cwd(), "oracle_client", "instantclient_19_23");
+        const libDir = path.resolve(
+          process.cwd(),
+          "oracle_client",
+          "instantclient_19_23"
+        );
+
         if (!process.env.PATH?.includes(libDir)) {
           process.env.PATH = `${libDir};${process.env.PATH}`;
         }
+
         oracledb.initOracleClient({ libDir });
       } else {
-        // Linux / Unix environment: cari direktori Oracle Instant Client
-        const candidateDirs = [
-          process.env.ORACLE_CLIENT_DIR,
-          "/opt/oracle/instantclient_19_23",
-          "/opt/oracle/instantclient_21_13",
-          "/opt/oracle/instantclient",
-          "/usr/lib/oracle/19.23/client64/lib",
-          "/usr/lib/oracle/21/client64/lib",
-        ].filter(Boolean) as string[];
+        // Linux / Unix
+        const libDir =
+          process.env.ORACLE_CLIENT_DIR ||
+          "/opt/oracle/instantclient_19_23";
 
-        const foundDir = candidateDirs.find((dir) => fs.existsSync(dir));
-        if (foundDir) {
-          oracledb.initOracleClient({ libDir: foundDir });
-        } else {
-          // Coba inisialisasi default sistem (LD_LIBRARY_PATH / ldconfig)
-          oracledb.initOracleClient();
+        if (!fs.existsSync(libDir)) {
+          throw new Error(
+            `Oracle Instant Client tidak ditemukan: ${libDir}`
+          );
         }
+
+        console.log("Oracle Client Directory:", libDir);
+
+        oracledb.initOracleClient({
+          libDir,
+        });
+
+        console.log(
+          "Oracle Thick Mode:",
+          !oracledb.thin
+        );
+
+        console.log(
+          "Oracle Client Version:",
+          oracledb.oracleClientVersionString
+        );
       }
+
       isOracleClientInitialized = true;
     } catch (err: any) {
-      // Abaikan jika sudah diinisialisasi sebelumnya
-      if (err.message && (err.message.includes("already been initialized") || err.message.includes("NJS-077"))) {
+      if (
+        err.message &&
+        (
+          err.message.includes("already been initialized") ||
+          err.message.includes("NJS-077")
+        )
+      ) {
         isOracleClientInitialized = true;
       } else {
-        console.warn("Oracle client initialization note:", err.message);
+        console.error(
+          "Oracle client initialization error:",
+          err
+        );
+
+        throw err;
       }
     }
   }
 }
+
 
 /**
  * Helper validasi & parsing 18 Digit NOP SISMIOP
@@ -255,7 +283,7 @@ export async function querySismiop(
         const tahun = String(row.THN_PAJAK_SPPT);
         const pbbHarusDibayar = Number(row.PBB_YG_HARUS_DIBAYAR_SPPT) || 0;
         const isLunas = String(row.STATUS_PEMBAYARAN_SPPT) === "1" || String(row.STATUS_PEMBAYARAN_SPPT) === "2";
-        
+
         totalKetetapan += pbbHarusDibayar;
         if (!isLunas) {
           totalTunggakan += pbbHarusDibayar;
