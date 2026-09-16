@@ -1,25 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { 
-  Database, 
-  Search, 
-  FileText, 
-  ExternalLink, 
-  Copy, 
-  Check, 
-  ShieldCheck, 
+import { useState, useEffect } from "react";
+import {
+  Database,
+  Search,
+  FileText,
+  ExternalLink,
+  Copy,
+  Check,
+  ShieldCheck,
   Layers,
   ArrowRight,
   Code
 } from "lucide-react";
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
   const [testNop, setTestNop] = useState("120301005600400580");
   const [activeTab, setActiveTab] = useState<"nop" | "sppt" | "bpn">("nop");
   const [apiResponse, setApiResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -79,16 +84,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <a
-              href="/api/v1/docs/openapi.json"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700"
-            >
-              <Code className="w-4 h-4 text-emerald-400" />
-              OpenAPI JSON
-              <ExternalLink className="w-3 h-3 text-slate-400" />
-            </a>
+
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -121,24 +117,7 @@ export default function Home() {
           </div>
 
           {/* Database Specs Card */}
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-800/80 text-xs">
-            <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-              <span className="text-slate-500 block">Host DB</span>
-              <span className="font-mono font-semibold text-emerald-400">103.167.12.59:1521</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-              <span className="text-slate-500 block">Database SID</span>
-              <span className="font-mono font-semibold text-cyan-400">SISMIOP</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-              <span className="text-slate-500 block">User DB</span>
-              <span className="font-mono font-semibold text-slate-200">PBB</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-              <span className="text-slate-500 block">Protokol</span>
-              <span className="font-mono font-semibold text-amber-400">TCP / Oracle OCI</span>
-            </div>
-          </div>
+
         </div>
 
         {/* Interactive API Explorer & Endpoints */}
@@ -270,25 +249,22 @@ export default function Home() {
               <div className="flex rounded-lg bg-slate-950 p-1 border border-slate-800 text-xs font-medium">
                 <button
                   onClick={() => setActiveTab("nop")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "nop" ? "bg-emerald-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "nop" ? "bg-emerald-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   Detail NOP
                 </button>
                 <button
                   onClick={() => setActiveTab("sppt")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "sppt" ? "bg-emerald-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "sppt" ? "bg-emerald-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   SPPT & Tagihan
                 </button>
                 <button
                   onClick={() => setActiveTab("bpn")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "bpn" ? "bg-cyan-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "bpn" ? "bg-cyan-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   Validasi BPN
                 </button>
@@ -301,7 +277,7 @@ export default function Home() {
                   type="text"
                   value={testNop}
                   onChange={(e) => setTestNop(e.target.value)}
-                  placeholder="120301005600400580"
+                  placeholder=""
                   className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-emerald-400 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
@@ -334,49 +310,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Data Dictionary & Standard */}
-        <div className="p-8 rounded-3xl bg-slate-900 border border-slate-800 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white">Struktur Standard 18 Digit NOP SISMIOP</h3>
-              <p className="text-xs text-slate-400">Format baku penomoran objek pajak bumi dan bangunan nasional</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-7 gap-2 font-mono text-center text-xs">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-emerald-400 font-bold block text-sm">AA</span>
-              <span className="text-slate-400 text-[10px]">Propinsi (2)</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-emerald-400 font-bold block text-sm">BB</span>
-              <span className="text-slate-400 text-[10px]">Dati II / Kota (2)</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-emerald-400 font-bold block text-sm">CCC</span>
-              <span className="text-slate-400 text-[10px]">Kecamatan (3)</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-emerald-400 font-bold block text-sm">DDD</span>
-              <span className="text-slate-400 text-[10px]">Kelurahan (3)</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-cyan-400 font-bold block text-sm">EEE</span>
-              <span className="text-slate-400 text-[10px]">Blok (3)</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-cyan-400 font-bold block text-sm">FFFF</span>
-              <span className="text-slate-400 text-[10px]">No Urut (4)</span>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="text-amber-400 font-bold block text-sm">G</span>
-              <span className="text-slate-400 text-[10px]">Jenis OP (1)</span>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );
