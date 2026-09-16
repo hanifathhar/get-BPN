@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { nop: rawNop } = await params;
     const result = await querySismiop("detail_nop", rawNop);
-    return NextResponse.json(result);
+    return NextResponse.json(result, { status: result.statusCode || 200 });
   } catch (error: any) {
     return NextResponse.json(
       {
