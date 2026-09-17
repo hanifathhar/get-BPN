@@ -289,7 +289,7 @@ print_r($data);`;
             {/* Badges / Pill specs */}
             <div className="pt-2 flex flex-wrap gap-2.5 text-xs">
               <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5 text-cyan-400" /> Oracle Enterprise SISMIOP
+                <Database className="w-3.5 h-3.5 text-cyan-400" /> Oracle Enterprise
               </span>
               <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-amber-400" /> OAuth2 / API Key / HMAC
@@ -374,7 +374,7 @@ print_r($data);`;
                   </button>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Layanan penarikan data master Objek Pajak (Identitas Wajib Pajak, Alamat Letak, Luas Bumi, Luas Bangunan, NJOP) berdasarkan 18 Digit NOP SISMIOP.
+                  Layanan penarikan data master Objek Pajak (Identitas Wajib Pajak, Alamat Letak, Luas Bumi, Luas Bangunan, NJOP) berdasarkan 18 Digit NOP.
                 </p>
                 <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 text-xs">
                   <span className="text-slate-400 font-mono text-[11px]">Tabel: DAT_OBJEK_PAJAK, DAT_SUBJEK_PAJAK</span>
@@ -446,7 +446,7 @@ print_r($data);`;
                   </button>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Layanan Zona Nilai Tanah (ZNT), Nilai Indikasi Rata-rata (NIR) per m², rincian bidang bumi, dan estimasi nilai pasar/NJOP bumi SISMIOP.
+                  Layanan Zona Nilai Tanah (ZNT), Nilai Indikasi Rata-rata (NIR) per m², rincian bidang bumi, dan estimasi nilai pasar/NJOP bumi.
                 </p>
                 <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 text-xs">
                   <span className="text-slate-400 font-mono text-[11px]">Tabel: DAT_OP_BUMI, DAT_NIR, DAT_ZNT</span>
@@ -482,7 +482,7 @@ print_r($data);`;
                   </button>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Layanan validasi silang (cross-match) bidang tanah BPN (NIB, Luas Ukur) dengan data SISMIOP PBB untuk penerbitan sertipikat dan validasi BPHTB.
+                  Layanan validasi silang (cross-match) bidang tanah BPN (NIB, Luas Ukur) dengan data PBB untuk penerbitan sertipikat dan validasi BPHTB.
                 </p>
                 <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 text-xs">
                   <span className="text-slate-400 font-mono text-[11px]">Payload: nop, nib, nomor_hak, luas_tanah_bpn</span>
@@ -747,7 +747,7 @@ print_r($data);`;
                   ) : activeTab === "bpn" ? (
                     <div className="space-y-3">
                       <div>
-                        <label className="text-xs text-slate-300 font-medium">18 Digit NOP SISMIOP</label>
+                        <label className="text-xs text-slate-300 font-medium">18 Digit NOP</label>
                         <input
                           type="text"
                           value={testNop}
@@ -970,7 +970,7 @@ print_r($data);`;
                     <pre className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-[360px] leading-relaxed select-all">
                       {apiResponse
                         ? JSON.stringify(apiResponse, null, 2)
-                        : `// Klik tombol 'Eksekusi Permintaan API' untuk melihat respon JSON real-time dari database Oracle SISMIOP.`}
+                        : `// Klik tombol 'Eksekusi Permintaan API' untuk melihat respon JSON real-time dari database.`}
                     </pre>
                   </div>
                 </div>
@@ -989,7 +989,7 @@ print_r($data);`;
                   Kamus Standar Respon & Kode Error SPLP
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Format dan spesifikasi status HTTP code yang dikembalikan oleh Gateway API SISMIOP & BPN.
+                  Format dan spesifikasi status HTTP code yang dikembalikan oleh Gateway API BPKPAD Kab. Tapanuli Selatan & BPN.
                 </p>
               </div>
               <button
@@ -1038,21 +1038,21 @@ print_r($data);`;
                     <td className="py-3 px-4 text-rose-300">SPLP-403</td>
                     <td className="py-3 px-4 font-bold text-rose-400">FORBIDDEN</td>
                     <td className="py-3 px-4 font-sans">Kredensial tidak memiliki hak akses atau sertifikat mTLS ditolak.</td>
-                    <td className="py-3 px-4 font-sans text-slate-400">Hubungi Administrator Bapenda/BPN untuk otorisasi scope.</td>
+                    <td className="py-3 px-4 font-sans text-slate-400">Hubungi Administrator BPKPAD Kab. Tapanuli Selatan untuk otorisasi scope.</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 font-bold text-amber-400">404 Not Found</td>
                     <td className="py-3 px-4 text-amber-300">SPLP-404</td>
                     <td className="py-3 px-4 font-bold text-amber-400">NOT_FOUND</td>
-                    <td className="py-3 px-4 font-sans">NOP objek pajak tidak terdaftar di basis data Oracle SISMIOP.</td>
+                    <td className="py-3 px-4 font-sans">NOP objek pajak tidak terdaftar di basis data.</td>
                     <td className="py-3 px-4 font-sans text-slate-400">Verifikasi NOP dengan berkas fisik SPPT/DHKP.</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 font-bold text-rose-400">500 Server Error</td>
                     <td className="py-3 px-4 text-rose-300">SPLP-500</td>
                     <td className="py-3 px-4 font-bold text-rose-400">ERROR</td>
-                    <td className="py-3 px-4 font-sans">Koneksi database Oracle timeout atau kesalahan internal server.</td>
-                    <td className="py-3 px-4 font-sans text-slate-400">Hubungi administrator infrastruktur SISMIOP.</td>
+                    <td className="py-3 px-4 font-sans">Koneksi database timeout atau kesalahan internal server.</td>
+                    <td className="py-3 px-4 font-sans text-slate-400">Hubungi Tim TI BPKPAD Kab. Tapanuli Selatan.</td>
                   </tr>
                 </tbody>
               </table>
