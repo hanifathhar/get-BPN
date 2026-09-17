@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SISMIOP PBB & BPN REST API",
-  description: "Dokumentasi & Layanan API Basis Data Oracle SISMIOP PBB dan BPN",
+  title: "TrustMark PBB dan BPHTB",
+  description: "Dokumentasi & Layanan API",
 };
 
 export default function RootLayout({
