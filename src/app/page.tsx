@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Database,
   Search,
@@ -218,8 +219,15 @@ print_r($data);`;
       <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-3.5">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-500 flex items-center justify-center text-white shadow-xl shadow-emerald-500/20 border border-emerald-400/30">
-              <Shield className="w-6 h-6 text-white" />
+            <div className="h-12 w-12 rounded-2xl bg-slate-900/90 p-1.5 flex items-center justify-center shadow-xl shadow-emerald-500/10 border border-slate-700/60 overflow-hidden">
+              <Image
+                src="/Logo-Tapsel.png"
+                alt="Logo Kabupaten Tapanuli Selatan"
+                width={40}
+                height={40}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -272,9 +280,7 @@ print_r($data);`;
           <div className="absolute top-0 right-0 -mt-16 -mr-16 w-[450px] h-[450px] bg-gradient-to-bl from-emerald-500/15 via-teal-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-3xl space-y-4 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" /> Sistem Penghubung Layanan Pemerintah (SPLP)
-            </div>
+
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
               Portal Integrasi API
@@ -294,30 +300,6 @@ print_r($data);`;
             </div>
           </div>
 
-          {/* Quick Metrics 4 Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-800/80">
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-              <div className="text-xs text-slate-400 font-medium">Katalog Layanan</div>
-              <div className="text-2xl font-black text-white mt-1">5 Endpoint</div>
-              <div className="text-[11px] text-emerald-400 flex items-center gap-1 mt-1">
-                <CheckCircle2 className="w-3 h-3" /> Siap Produksi
-              </div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-              <div className="text-xs text-slate-400 font-medium">Database Backend</div>
-              <div className="text-2xl font-black text-white mt-1">Oracle 19c</div>
-              <div className="text-[11px] text-cyan-400 flex items-center gap-1 mt-1">
-                <Activity className="w-3 h-3" /> Thick Mode Active
-              </div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-              <div className="text-xs text-slate-400 font-medium">Tingkat Keamanan</div>
-              <div className="text-2xl font-black text-white mt-1">SPLP Multi-Auth</div>
-              <div className="text-[11px] text-amber-400 flex items-center gap-1 mt-1">
-                <ShieldCheck className="w-3 h-3" /> Replay-Proof
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* View 1: Katalog Layanan API & Interactive Explorer */}
@@ -1082,8 +1064,14 @@ print_r($data);`;
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950 py-8 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-emerald-500" />
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/Logo-Tapsel.png"
+              alt="Logo Tapsel"
+              width={20}
+              height={20}
+              className="h-5 w-5 object-contain"
+            />
             <span>© 2026 Dikembangkan oleh Tim TI Kabupaten Tapanuli Selatan. All Rights Reserved.</span>
           </div>
           <div className="flex items-center gap-4 text-slate-400">

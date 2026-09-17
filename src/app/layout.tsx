@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TrustMark PBB dan BPHTB",
-  description: "Dokumentasi & Layanan API",
+  title: "TrustMark PBB dan BPHTB - Kabupaten Tapanuli Selatan",
+  description: "Dokumentasi & Layanan API Interoperabilitas",
+  icons: {
+    icon: "/Logo-Tapsel.png",
+    shortcut: "/Logo-Tapsel.png",
+    apple: "/Logo-Tapsel.png",
+  },
 };
 
 export default function RootLayout({
