@@ -18,7 +18,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
   const [testNop, setTestNop] = useState("120301005600400580");
-  const [activeTab, setActiveTab] = useState<"nop" | "sppt" | "bpn">("nop");
+  const [activeTab, setActiveTab] = useState<"nop" | "sppt" | "znt" | "bpn">("nop");
   const [apiResponse, setApiResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -41,6 +41,8 @@ export default function Home() {
 
       if (type === "sppt") {
         url = `/api/v1/pbb/sppt/${testNop}`;
+      } else if (type === "znt") {
+        url = `/api/v1/pbb/znt/${testNop}`;
       } else if (type === "bpn") {
         url = `/api/v1/pbb/bpn-validasi`;
         options = {
@@ -112,7 +114,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-              API terstandarisasi untuk menarik informasi master objek pajak PBB, riwayat ketetapan SPPT, status pelunasan/tunggakan, serta validasi komparasi bidang tanah BPN secara real-time.
+              API terstandarisasi untuk menarik informasi master objek pajak PBB, riwayat ketetapan SPPT, status pelunasan/tunggakan, Zona Nilai Tanah (ZNT), serta validasi komparasi bidang tanah BPN secara real-time.
             </p>
           </div>
 
@@ -198,7 +200,40 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Endpoint Item 3: BPN Validasi */}
+            {/* Endpoint Item 3: ZNT */}
+            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="px-2.5 py-1 text-xs font-bold font-mono rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    GET
+                  </span>
+                  <span className="font-mono font-medium text-slate-200 text-sm">
+                    /api/v1/pbb/znt/<span className="text-amber-400">&#123;nop&#125;</span>
+                  </span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard("/api/v1/pbb/znt/120301005600400580", "znt")}
+                  className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-md transition-colors"
+                  title="Copy Path"
+                >
+                  {copiedEndpoint === "znt" ? <Check className="w-4 h-4 text-amber-400" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Menampilkan informasi Zona Nilai Tanah (ZNT), Nilai Indikasi Rata-rata (NIR), rincian bidang bumi, dan estimasi NJOP per m² dari database SISMIOP.
+              </p>
+              <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 text-xs">
+                <span className="text-slate-500">Tabel: DAT_OP_BUMI, DAT_ZNT, DAT_OBJEK_PAJAK, REF_KECAMATAN</span>
+                <button
+                  onClick={() => { setActiveTab("znt"); handleTestApi("znt"); }}
+                  className="text-amber-400 hover:text-amber-300 font-medium inline-flex items-center gap-1"
+                >
+                  Uji Endpoint <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Endpoint Item 4: BPN Validasi */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -214,7 +249,7 @@ export default function Home() {
                   className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-md transition-colors"
                   title="Copy Path"
                 >
-                  {copiedEndpoint === "bpn" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                  {copiedEndpoint === "bpn" ? <Check className="w-4 h-4 text-cyan-400" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -259,14 +294,21 @@ export default function Home() {
                   className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "sppt" ? "bg-emerald-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
                     }`}
                 >
-                  SPPT & Tagihan
+                  SPPT
+                </button>
+                <button
+                  onClick={() => setActiveTab("znt")}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "znt" ? "bg-amber-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
+                    }`}
+                >
+                  ZNT
                 </button>
                 <button
                   onClick={() => setActiveTab("bpn")}
                   className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "bpn" ? "bg-cyan-500 text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
                     }`}
                 >
-                  Validasi BPN
+                  BPN
                 </button>
               </div>
 
@@ -281,6 +323,7 @@ export default function Home() {
                   className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-emerald-400 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
+
 
               <button
                 onClick={() => handleTestApi(activeTab)}
