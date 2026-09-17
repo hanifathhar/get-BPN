@@ -16,7 +16,7 @@ import {
 
 export default function Home() {
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
-  const [testNop, setTestNop] = useState("120301005600400580");
+  const [testNop, setTestNop] = useState("1203010056xxxxxxxx");
   const [activeTab, setActiveTab] = useState<"nop" | "sppt" | "znt" | "bpn" | "token">("nop");
   const [authMode, setAuthMode] = useState<"apikey" | "bearer" | "none">("apikey");
   const [apiKey, setApiKey] = useState("bpn-sismiop-pbb-secret-2026");
@@ -375,33 +375,30 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setAuthMode("apikey")}
-                    className={`flex-1 py-1.5 px-2 rounded-lg border text-center transition-all ${
-                      authMode === "apikey"
-                        ? "bg-amber-500/20 border-amber-500/50 text-amber-300 font-bold"
-                        : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-                    }`}
+                    className={`flex-1 py-1.5 px-2 rounded-lg border text-center transition-all ${authMode === "apikey"
+                      ? "bg-amber-500/20 border-amber-500/50 text-amber-300 font-bold"
+                      : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                      }`}
                   >
                     API Key
                   </button>
                   <button
                     type="button"
                     onClick={() => setAuthMode("bearer")}
-                    className={`flex-1 py-1.5 px-2 rounded-lg border text-center transition-all ${
-                      authMode === "bearer"
-                        ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-300 font-bold"
-                        : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-                    }`}
+                    className={`flex-1 py-1.5 px-2 rounded-lg border text-center transition-all ${authMode === "bearer"
+                      ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-300 font-bold"
+                      : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                      }`}
                   >
                     OAuth2 Bearer
                   </button>
                   <button
                     type="button"
                     onClick={() => setAuthMode("none")}
-                    className={`flex-1 py-1.5 px-2 rounded-lg border text-center transition-all ${
-                      authMode === "none"
-                        ? "bg-rose-500/20 border-rose-500/50 text-rose-300 font-bold"
-                        : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-                    }`}
+                    className={`flex-1 py-1.5 px-2 rounded-lg border text-center transition-all ${authMode === "none"
+                      ? "bg-rose-500/20 border-rose-500/50 text-rose-300 font-bold"
+                      : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                      }`}
                     title="Uji respon 401 Unauthorized"
                   >
                     Tanpa Auth (401)
@@ -448,51 +445,46 @@ export default function Home() {
               <div className="flex rounded-lg bg-slate-950 p-1 border border-slate-800 text-xs font-medium">
                 <button
                   onClick={() => setActiveTab("nop")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "nop"
-                      ? "bg-emerald-500 text-slate-950 font-bold"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "nop"
+                    ? "bg-emerald-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   Detail NOP
                 </button>
                 <button
                   onClick={() => setActiveTab("sppt")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "sppt"
-                      ? "bg-emerald-500 text-slate-950 font-bold"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "sppt"
+                    ? "bg-emerald-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   SPPT
                 </button>
                 <button
                   onClick={() => setActiveTab("znt")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "znt"
-                      ? "bg-amber-500 text-slate-950 font-bold"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "znt"
+                    ? "bg-amber-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   ZNT
                 </button>
                 <button
                   onClick={() => setActiveTab("bpn")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "bpn"
-                      ? "bg-cyan-500 text-slate-950 font-bold"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "bpn"
+                    ? "bg-cyan-500 text-slate-950 font-bold"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   BPN
                 </button>
                 <button
                   onClick={() => setActiveTab("token")}
-                  className={`flex-1 py-1.5 rounded-md transition-all ${
-                    activeTab === "token"
-                      ? "bg-indigo-500 text-white font-bold"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`flex-1 py-1.5 rounded-md transition-all ${activeTab === "token"
+                    ? "bg-indigo-500 text-white font-bold"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   OAuth2
                 </button>
