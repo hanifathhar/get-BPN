@@ -261,18 +261,7 @@ print_r($data);`;
             </button>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <a
-              href="/api/v1/docs/openapi.json"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white text-xs border border-slate-800 transition-colors"
-            >
-              <FileCode className="w-3.5 h-3.5 text-emerald-400" />
-              <span>OpenAPI Spec</span>
-              <ExternalLink className="w-3 h-3 text-slate-500" />
-            </a>
-          </div>
+
         </div>
       </header>
 
