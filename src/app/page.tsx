@@ -33,8 +33,9 @@ import {
 export default function Home() {
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
   const [testNop, setTestNop] = useState("120301005600400580");
+  const [testNtpd, setTestNtpd] = useState("129641113012020090071");
   const [activeView, setActiveView] = useState<"catalog" | "sandbox" | "docs" | "codes">("catalog");
-  const [activeTab, setActiveTab] = useState<"nop" | "sppt" | "znt" | "bpn" | "token">("nop");
+  const [activeTab, setActiveTab] = useState<"nop" | "sppt" | "znt" | "bpn" | "bphtb" | "token">("nop");
   const [authMode, setAuthMode] = useState<"apikey" | "bearer" | "none">("apikey");
   const [apiKey, setApiKey] = useState("bpn-sismiop-pbb-secret-2026");
   const [bearerToken, setBearerToken] = useState("");
@@ -124,6 +125,15 @@ export default function Home() {
             luas_tanah_bpn: Number(luasTanahBpn) || 0,
           }),
         };
+      } else if (type === "bphtb") {
+        url = `/api/v1/bphtb/inquiry`;
+        options = {
+          method: "POST",
+          body: JSON.stringify({
+            nop: testNop,
+            ntpd: testNtpd,
+          }),
+        };
       }
 
       options.headers = headers;
@@ -159,6 +169,11 @@ export default function Home() {
       endpointPath = `/api/v1/pbb/bpn-validasi`;
       method = "POST";
       bodyJson = JSON.stringify({ nop: testNop, nib, nomor_hak: nomorHak, luas_tanah_bpn: Number(luasTanahBpn) }, null, 2);
+    }
+    if (activeTab === "bphtb") {
+      endpointPath = `/api/v1/bphtb/inquiry`;
+      method = "POST";
+      bodyJson = JSON.stringify({ nop: testNop, ntpd: testNtpd }, null, 2);
     }
     if (activeTab === "token") {
       endpointPath = `/api/v1/auth/token`;
@@ -289,7 +304,10 @@ print_r($data);`;
             {/* Badges / Pill specs */}
             <div className="pt-2 flex flex-wrap gap-2.5 text-xs">
               <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5 text-cyan-400" /> Oracle Enterprise
+                <Database className="w-3.5 h-3.5 text-cyan-400" /> Oracle SISMIOP
+              </span>
+              <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 flex items-center gap-1.5">
+                <Database className="w-3.5 h-3.5 text-blue-400" /> PostgreSQL BPHTB
               </span>
               <span className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-amber-400" /> OAuth2 / API Key / HMAC
@@ -494,6 +512,50 @@ print_r($data);`;
                   </button>
                 </div>
               </div>
+
+              {/* Endpoint 5: BPHTB Inquiry */}
+              <div className="p-5 rounded-2xl bg-slate-900/90 border border-blue-500/30 hover:border-blue-500/60 transition-all space-y-3 group shadow-lg shadow-blue-950/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span className="px-2.5 py-1 text-xs font-black font-mono rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/40">
+                      POST / GET
+                    </span>
+                    <span className="font-mono font-semibold text-slate-100 text-sm">
+                      /api/v1/bphtb/inquiry
+                    </span>
+                    <span title="Terproteksi SPLP Auth">
+                      <Lock className="w-3.5 h-3.5 text-amber-400" />
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 font-medium border border-blue-500/30">
+                      PostgreSQL
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/bphtb/inquiry", "bphtb")}
+                    className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+                    title="Copy Full URL"
+                  >
+                    {copiedEndpoint === "bphtb" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Layanan inquiry status pembayaran BPHTB, tanggal bayar, jenis bayar, dan nominal ketetapan dari basis data PostgreSQL (<code>dbbphtb</code>) berdasarkan NOP dan NTPD / Nomor STS.
+                </p>
+                <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 text-xs">
+                  <span className="text-slate-400 font-mono text-[11px]">Tabel: tbl_bphtb (nop, no_sts)</span>
+                  <button
+                    onClick={() => {
+                      setActiveTab("bphtb");
+                      setActiveView("sandbox");
+                      setTestNop("120310007200401690");
+                      setTestNtpd("129641113012020090071");
+                    }}
+                    className="text-blue-400 hover:text-blue-300 font-bold inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                  >
+                    Uji di Sandbox <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Right Column: Quick Authentication Card & Overview */}
@@ -599,7 +661,7 @@ print_r($data);`;
                   {/* Service Selector Tabs */}
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-slate-300">Pilih Layanan API:</label>
-                    <div className="grid grid-cols-5 gap-1.5 bg-slate-950 p-1.5 rounded-2xl border border-slate-800 text-xs font-medium">
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 bg-slate-950 p-1.5 rounded-2xl border border-slate-800 text-xs font-medium">
                       <button
                         onClick={() => setActiveTab("nop")}
                         className={`py-2 rounded-xl transition-all ${activeTab === "nop" ? "bg-emerald-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
@@ -627,6 +689,13 @@ print_r($data);`;
                           }`}
                       >
                         Validasi BPN
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("bphtb")}
+                        className={`py-2 rounded-xl transition-all ${activeTab === "bphtb" ? "bg-blue-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
+                          }`}
+                      >
+                        BPHTB
                       </button>
                       <button
                         onClick={() => setActiveTab("token")}
@@ -785,6 +854,29 @@ print_r($data);`;
                         />
                       </div>
                     </div>
+                  ) : activeTab === "bphtb" ? (
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs text-slate-300 font-medium">18 Digit NOP (Nomor Objek Pajak)</label>
+                        <input
+                          type="text"
+                          value={testNop}
+                          onChange={(e) => setTestNop(e.target.value)}
+                          placeholder="Contoh: 120301005600400580..."
+                          className="w-full px-3.5 py-2 mt-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-blue-400 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-300 font-medium">NTPD / Nomor STS</label>
+                        <input
+                          type="text"
+                          value={testNtpd}
+                          onChange={(e) => setTestNtpd(e.target.value)}
+                          placeholder="Contoh: 202601001..."
+                          className="w-full px-3.5 py-2 mt-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-blue-300 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
                   ) : (
                     <div className="space-y-1.5">
                       <label className="text-xs text-slate-300 font-medium">Nomor Objek Pajak (18 Digit NOP)</label>
@@ -807,7 +899,7 @@ print_r($data);`;
                     {loading ? (
                       <>
                         <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Memproses Query Oracle...</span>
+                        <span>Memproses Permintaan Basis Data...</span>
                       </>
                     ) : activeTab === "token" ? (
                       <>
@@ -864,92 +956,148 @@ print_r($data);`;
                     </div>
                     {apiResponse && (
                       <span
-                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${apiResponse.status === "SUCCESS"
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${apiResponse.status === "SUCCESS" || apiResponse.respon_code === "OK"
                           ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                           : apiResponse.status === "UNAUTHORIZED"
                             ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
                             : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
                           }`}
                       >
-                        Status: {apiResponse.statusCode || apiResponse.status || (apiResponse.access_token ? "200 OK" : "ERROR")}
+                        Status: {apiResponse.statusCode || apiResponse.respon_code || apiResponse.status || (apiResponse.access_token ? "200 OK" : "ERROR")}
                       </span>
                     )}
                   </div>
 
                   {/* Formatted View jika berhasil */}
-                  {apiResponse?.data && (
+                  {(apiResponse?.data || apiResponse?.result) && (
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-3">
                       <div className="text-xs font-bold text-emerald-400 border-b border-slate-800 pb-2 flex items-center justify-between">
                         <span>Ringkasan Data Terverifikasi</span>
-                        <span className="font-mono text-slate-400">{apiResponse.data.nop || apiResponse.data.nop_raw}</span>
+                        <span className="font-mono text-slate-400">
+                          {apiResponse?.result?.NOP || apiResponse?.data?.NOP || apiResponse?.data?.nop || apiResponse?.data?.nop_raw}
+                        </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        {apiResponse.data.nama_wp || apiResponse.data.nm_wp ? (
+                      {/* BPHTB Result View */}
+                      {(apiResponse?.result?.NAMA || apiResponse?.data?.NAMA) ? (
+                        <div className="grid grid-cols-2 gap-3 text-xs">
                           <div>
                             <span className="text-slate-500 block">Nama Wajib Pajak:</span>
-                            <span className="font-semibold text-white">{apiResponse.data.nama_wp || apiResponse.data.nm_wp}</span>
+                            <span className="font-semibold text-white">
+                              {apiResponse.result?.NAMA || apiResponse.data?.NAMA}
+                            </span>
                           </div>
-                        ) : null}
-
-                        {apiResponse.data.alamat_op ? (
                           <div>
-                            <span className="text-slate-500 block">Alamat Objek Pajak:</span>
-                            <span className="font-semibold text-white">{apiResponse.data.alamat_op}</span>
+                            <span className="text-slate-500 block">Alamat Wajib Pajak:</span>
+                            <span className="font-semibold text-white">
+                              {apiResponse.result?.ALAMAT || apiResponse.data?.ALAMAT || "-"}
+                            </span>
                           </div>
-                        ) : null}
+                          <div>
+                            <span className="text-slate-500 block">Kelurahan & Kecamatan:</span>
+                            <span className="font-semibold text-white">
+                              {apiResponse.result?.KELURAHAN_OP || apiResponse.data?.KELURAHAN_OP}, {apiResponse.result?.KECAMATAN_OP || apiResponse.data?.KECAMATAN_OP}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Luas Tanah / Bangunan:</span>
+                            <span className="font-semibold text-white">
+                              {apiResponse.result?.LUASTANAH ?? apiResponse.data?.LUASTANAH} m² / {apiResponse.result?.LUASBANGUNAN ?? apiResponse.data?.LUASBANGUNAN} m²
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Nominal Pembayaran / Kurang:</span>
+                            <span className="font-bold text-emerald-400">
+                              Rp {Number(apiResponse.result?.PEMBAYARAN ?? apiResponse.data?.PEMBAYARAN ?? 0).toLocaleString("id-ID")}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Status Pembayaran:</span>
+                            <span className={`font-bold ${(apiResponse.result?.STATUS || apiResponse.data?.STATUS) === "Y" ? "text-emerald-400" : "text-amber-400"}`}>
+                              {(apiResponse.result?.STATUS || apiResponse.data?.STATUS) === "Y" ? "LUNAS (Y)" : "BELUM LUNAS / TERHUTANG (T)"} (Jenis: {apiResponse.result?.JENISBAYAR || apiResponse.data?.JENISBAYAR})
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Tanggal Pembayaran / SKP:</span>
+                            <span className="font-semibold text-white">
+                              {apiResponse.result?.TANGGAL_PEMBAYARAN || apiResponse.data?.TANGGAL_PEMBAYARAN || "-"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">NTPD / Nomor STS:</span>
+                            <span className="font-mono text-cyan-400 font-bold">
+                              {apiResponse.result?.NTPD || apiResponse.data?.NTPD}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                          {apiResponse.data?.nama_wp || apiResponse.data?.nm_wp ? (
+                            <div>
+                              <span className="text-slate-500 block">Nama Wajib Pajak:</span>
+                              <span className="font-semibold text-white">{apiResponse.data.nama_wp || apiResponse.data.nm_wp}</span>
+                            </div>
+                          ) : null}
 
-                        {apiResponse.data.rekap_bumi ? (
-                          <>
+                          {apiResponse.data?.alamat_op ? (
                             <div>
-                              <span className="text-slate-500 block">Kode ZNT & NIR:</span>
-                              <span className="font-bold text-amber-400">
-                                {apiResponse.data.rekap_bumi.kode_znt_utama} (Rp {apiResponse.data.rekap_bumi.nir_utama_rupiah?.toLocaleString("id-ID") || "-"} / m²)
-                              </span>
+                              <span className="text-slate-500 block">Alamat Objek Pajak:</span>
+                              <span className="font-semibold text-white">{apiResponse.data.alamat_op}</span>
                             </div>
-                            <div>
-                              <span className="text-slate-500 block">Total Luas & NJOP Bumi:</span>
-                              <span className="font-semibold text-white">
-                                {apiResponse.data.rekap_bumi.total_luas_bumi} m² (Rp {apiResponse.data.rekap_bumi.total_njop_bumi?.toLocaleString("id-ID")})
-                              </span>
-                            </div>
-                          </>
-                        ) : null}
+                          ) : null}
 
-                        {apiResponse.data.ringkasan ? (
-                          <>
-                            <div>
-                              <span className="text-slate-500 block">Total Ketetapan SPPT:</span>
-                              <span className="font-semibold text-white">
-                                Rp {apiResponse.data.ringkasan.total_ketetapan?.toLocaleString("id-ID")}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-slate-500 block">Status Tunggakan:</span>
-                              <span className={`font-bold ${apiResponse.data.ringkasan.total_tunggakan === 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                                {apiResponse.data.ringkasan.status_keseluruhan}
-                              </span>
-                            </div>
-                          </>
-                        ) : null}
+                          {apiResponse.data?.rekap_bumi ? (
+                            <>
+                              <div>
+                                <span className="text-slate-500 block">Kode ZNT & NIR:</span>
+                                <span className="font-bold text-amber-400">
+                                  {apiResponse.data.rekap_bumi.kode_znt_utama} (Rp {apiResponse.data.rekap_bumi.nir_utama_rupiah?.toLocaleString("id-ID") || "-"} / m²)
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500 block">Total Luas & NJOP Bumi:</span>
+                                <span className="font-semibold text-white">
+                                  {apiResponse.data.rekap_bumi.total_luas_bumi} m² (Rp {apiResponse.data.rekap_bumi.total_njop_bumi?.toLocaleString("id-ID")})
+                                </span>
+                              </div>
+                            </>
+                          ) : null}
 
-                        {apiResponse.data.komparasi_luas ? (
-                          <>
-                            <div>
-                              <span className="text-slate-500 block">Status Kesesuaian BPN:</span>
-                              <span className="font-bold text-cyan-400">
-                                {apiResponse.data.komparasi_luas.status}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-slate-500 block">Selisih Luas Ukur:</span>
-                              <span className="font-semibold text-white">
-                                {apiResponse.data.komparasi_luas.selisih_m2} m² ({apiResponse.data.komparasi_luas.persentase_selisih})
-                              </span>
-                            </div>
-                          </>
-                        ) : null}
-                      </div>
+                          {apiResponse.data?.ringkasan ? (
+                            <>
+                              <div>
+                                <span className="text-slate-500 block">Total Ketetapan SPPT:</span>
+                                <span className="font-semibold text-white">
+                                  Rp {apiResponse.data.ringkasan.total_ketetapan?.toLocaleString("id-ID")}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500 block">Status Tunggakan:</span>
+                                <span className={`font-bold ${apiResponse.data.ringkasan.total_tunggakan === 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                                  {apiResponse.data.ringkasan.status_keseluruhan}
+                                </span>
+                              </div>
+                            </>
+                          ) : null}
+
+                          {apiResponse.data?.komparasi_luas ? (
+                            <>
+                              <div>
+                                <span className="text-slate-500 block">Status Kesesuaian BPN:</span>
+                                <span className="font-bold text-cyan-400">
+                                  {apiResponse.data.komparasi_luas.status}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500 block">Selisih Luas Ukur:</span>
+                                <span className="font-semibold text-white">
+                                  {apiResponse.data.komparasi_luas.selisih_m2} m² ({apiResponse.data.komparasi_luas.persentase_selisih})
+                                </span>
+                              </div>
+                            </>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
                   )}
 

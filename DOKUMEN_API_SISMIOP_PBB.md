@@ -59,7 +59,34 @@ WHERE A.KD_PROPINSI||A.KD_DATI2||A.KD_KECAMATAN||A.KD_KELURAHAN||A.KD_BLOK||A.NO
 
 ## 4. Daftar Endpoint REST API
 
-- `GET /api/v1/pbb/nop/:nop`
-- `GET /api/v1/pbb/sppt/:nop`
-- `POST /api/v1/pbb/bpn-validasi`
-- `GET /api/v1/docs/openapi.json`
+- `POST /api/v1/auth/token` - Autentikasi OAuth2 Client Credentials (SPLP)
+- `GET /api/v1/pbb/nop/:nop` - Detail Wajib Pajak & Objek Pajak PBB
+- `GET /api/v1/pbb/sppt/:nop` - Riwayat Ketetapan & Pembayaran SPPT PBB
+- `GET /api/v1/pbb/znt/:nop` - Informasi Zona Nilai Tanah & NIR PBB
+- `POST /api/v1/pbb/bpn-validasi` - Komparasi & Validasi Data Bidang BPN vs PBB
+- `POST /api/v1/bphtb/inquiry` - Inquiry Status Bayar & Data Objek BPHTB (PostgreSQL)
+- `GET /api/v1/bphtb/inquiry?nop=...&ntpd=...` - Inquiry Data BPHTB via Query Params
+- `GET /api/v1/docs/openapi.json` - Spesifikasi Resmi OpenAPI 3.0
+
+---
+
+## 5. Basis Data BPHTB (PostgreSQL)
+
+| Parameter | Nilai / Konfigurasi |
+|---|---|
+| **Host IP** | `192.168.1.101` |
+| **Port** | `5432` |
+| **Database** | `dbbphtb` |
+| **Username** | `postgres` |
+| **Password** | `rahasia` |
+| **Tabel** | `tbl_bphtb` |
+
+### Query BPHTB:
+```sql
+SELECT *,
+  CASE WHEN CAST(status_bayar AS VARCHAR) = '1' THEN 'Y' ELSE 'T' END AS status,
+  CASE WHEN CAST(status_bayar AS VARCHAR) = '1' THEN 'L' ELSE 'H' END AS jenisbayar
+FROM tbl_bphtb 
+WHERE nop = $1 AND no_sts = $2;
+```
+

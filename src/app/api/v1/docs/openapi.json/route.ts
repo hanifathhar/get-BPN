@@ -6,7 +6,7 @@ export async function GET() {
     info: {
       title: "SISMIOP PBB & BPN Integration REST API (SPLP Standard)",
       description:
-        "Dokumentasi API Terstandarisasi untuk Integrasi dan Penarikan Data dari Database Oracle SISMIOP PBB dengan Standar Keamanan SPLP (API Key, OAuth2 Bearer, SPLP Signature, mTLS).",
+        "Dokumentasi API Terstandarisasi untuk Integrasi dan Penarikan Data dari Database Oracle SISMIOP PBB dan PostgreSQL BPHTB dengan Standar Keamanan SPLP (API Key, OAuth2 Bearer, SPLP Signature, mTLS).",
       version: "1.0.0",
     },
     components: {
@@ -170,9 +170,87 @@ export async function GET() {
           },
         },
       },
+      "/api/v1/bphtb/inquiry": {
+        post: {
+          summary: "Inquiry Data Status & Pembayaran BPHTB (PostgreSQL)",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    nop: { type: "string", example: "120301005600400580" },
+                    ntpd: { type: "string", example: "202601001" },
+                  },
+                  required: ["nop", "ntpd"],
+                },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Data BPHTB berhasil ditemukan",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      respon_code: { type: "string", example: "OK" },
+                      status: { type: "string", example: "SUCCESS" },
+                      statusCode: { type: "integer", example: 200 },
+                      result: {
+                        type: "object",
+                        properties: {
+                          NOP: { type: "string" },
+                          NIK: { type: "string" },
+                          NAMA: { type: "string" },
+                          ALAMAT: { type: "string" },
+                          KELURAHAN_OP: { type: "string" },
+                          KECAMATAN_OP: { type: "string" },
+                          KOTA_OP: { type: "string" },
+                          LUASTANAH: { type: "number" },
+                          LUASBANGUNAN: { type: "number" },
+                          PEMBAYARAN: { type: "number" },
+                          STATUS: { type: "string", example: "Y" },
+                          TANGGAL_PEMBAYARAN: { type: "string", example: "20/01/2026" },
+                          NTPD: { type: "string" },
+                          JENISBAYAR: { type: "string", example: "L" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            "400": { description: "Parameter NOP / NTPD tidak lengkap" },
+            "404": { description: "Data BPHTB tidak ditemukan" },
+            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+          },
+        },
+        get: {
+          summary: "Inquiry Data Status & Pembayaran BPHTB via Query Params",
+          parameters: [
+            {
+              name: "nop",
+              in: "query",
+              required: true,
+              schema: { type: "string", example: "120301005600400580" },
+            },
+            {
+              name: "ntpd",
+              in: "query",
+              required: true,
+              schema: { type: "string", example: "202601001" },
+            },
+          ],
+          responses: {
+            "200": { description: "Data BPHTB berhasil ditemukan" },
+            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+          },
+        },
+      },
     },
   };
   return NextResponse.json(openApiSpec);
 }
-
-
