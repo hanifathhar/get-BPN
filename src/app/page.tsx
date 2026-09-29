@@ -956,14 +956,14 @@ print_r($data);`;
                     </div>
                     {apiResponse && (
                       <span
-                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${apiResponse.status === "SUCCESS" || apiResponse.respon_code === "OK"
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${apiResponse.status === "SUCCESS" || apiResponse.respon_code === "OK" || apiResponse.result || apiResponse.access_token || apiResponse.statusCode === 200
                           ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                           : apiResponse.status === "UNAUTHORIZED"
                             ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
                             : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
                           }`}
                       >
-                        Status: {apiResponse.statusCode || apiResponse.respon_code || apiResponse.status || (apiResponse.access_token ? "200 OK" : "ERROR")}
+                        Status: {apiResponse.statusCode || apiResponse.respon_code || apiResponse.status || (apiResponse.result || apiResponse.access_token ? "200 OK" : "ERROR")}
                       </span>
                     )}
                   </div>
