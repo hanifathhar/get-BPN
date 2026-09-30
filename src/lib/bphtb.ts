@@ -1,6 +1,7 @@
 import net from "net";
 import { Client as SSHClient } from "ssh2";
-import { Pool, PoolClient } from "pg";
+import pg, { type PoolClient, type Pool } from "pg";
+const { Pool: PgPool } = pg;
 
 let pool: Pool | null = null;
 let tunnelServer: net.Server | null = null;
@@ -10,6 +11,27 @@ let isTunnelInitializing = false;
 
 interface TunnelInfo {
   port: number;
+}
+
+function cleanupTunnel() {
+  if (pool) {
+    pool.end().catch(() => {});
+    pool = null;
+  }
+  if (tunnelServer) {
+    try {
+      tunnelServer.close();
+    } catch (_) {}
+    tunnelServer = null;
+  }
+  if (sshClient) {
+    try {
+      sshClient.end();
+    } catch (_) {}
+    sshClient = null;
+  }
+  activeTunnelPort = null;
+  isTunnelInitializing = false;
 }
 
 /**
@@ -47,21 +69,41 @@ function ensureSshTunnel(): Promise<TunnelInfo> {
       console.log(`[BPHTB SSH] ✅ Terhubung ke SSH Gateway: ${sshHost}:${sshPort}`);
 
       const server = net.createServer((sock) => {
-        ssh.forwardOut(
-          sock.remoteAddress || "127.0.0.1",
-          sock.remotePort || 0,
-          targetHost,
-          targetPort,
-          (err, stream) => {
-            if (err) {
-              console.error("[BPHTB SSH] Forward stream error:", err.message);
-              sock.destroy();
-              return;
+        sock.on("error", (err) => {
+          console.error("[BPHTB SSH Sock] Socket error:", err.message);
+        });
+
+        try {
+          ssh.forwardOut(
+            sock.remoteAddress || "127.0.0.1",
+            sock.remotePort || 0,
+            targetHost,
+            targetPort,
+            (err, stream) => {
+              if (err) {
+                console.error("[BPHTB SSH] Forward stream error:", err.message);
+                sock.destroy();
+                cleanupTunnel();
+                return;
+              }
+              sock.pipe(stream);
+              stream.pipe(sock);
+
+              stream.on("error", (sErr) => {
+                console.error("[BPHTB SSH] Stream error:", sErr.message);
+                sock.destroy();
+              });
+
+              stream.on("close", () => {
+                sock.destroy();
+              });
             }
-            sock.pipe(stream);
-            stream.pipe(sock);
-          }
-        );
+          );
+        } catch (fwdErr: any) {
+          console.error("[BPHTB SSH] forwardOut uncaught error:", fwdErr?.message);
+          sock.destroy();
+          cleanupTunnel();
+        }
       });
 
       server.listen(0, "127.0.0.1", () => {
@@ -79,30 +121,25 @@ function ensureSshTunnel(): Promise<TunnelInfo> {
 
       server.on("error", (err) => {
         console.error("[BPHTB SSH] Server error:", err);
-        isTunnelInitializing = false;
-        activeTunnelPort = null;
-        tunnelServer = null;
-        ssh.end();
+        cleanupTunnel();
         reject(err);
       });
     });
 
     ssh.on("error", (err) => {
       console.error("[BPHTB SSH] Client connection error:", err.message);
-      isTunnelInitializing = false;
-      activeTunnelPort = null;
-      sshClient = null;
+      cleanupTunnel();
       reject(err);
+    });
+
+    ssh.on("close", () => {
+      console.log("[BPHTB SSH] Connection closed.");
+      cleanupTunnel();
     });
 
     ssh.on("end", () => {
       console.log("[BPHTB SSH] Connection ended.");
-      activeTunnelPort = null;
-      sshClient = null;
-      if (tunnelServer) {
-        tunnelServer.close();
-        tunnelServer = null;
-      }
+      cleanupTunnel();
     });
 
     ssh.connect({
@@ -111,6 +148,8 @@ function ensureSshTunnel(): Promise<TunnelInfo> {
       username: sshUser,
       password: sshPassword,
       readyTimeout: 15000,
+      keepaliveInterval: 10000,
+      keepaliveCountMax: 3,
     });
   });
 }
@@ -137,7 +176,7 @@ export async function getBphtbPool(): Promise<Pool> {
     const user = process.env.BPHTB_DB_USER || "postgres";
     const password = process.env.BPHTB_DB_PASSWORD || "rahasia";
 
-    pool = new Pool({
+    pool = new PgPool({
       host: targetHost,
       port: targetPort,
       database,
@@ -150,7 +189,7 @@ export async function getBphtbPool(): Promise<Pool> {
 
     pool.on("error", (err) => {
       console.error("[BPHTB Postgres] Unexpected error on idle client:", err);
-      pool = null;
+      cleanupTunnel();
     });
   }
 
