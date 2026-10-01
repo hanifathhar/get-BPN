@@ -4,111 +4,105 @@ export async function GET() {
   const openApiSpec = {
     openapi: "3.0.3",
     info: {
-      title: "SISMIOP PBB & BPN Integration REST API (SPLP Standard)",
+      title: "SISMIOP PBB & BPHTB Integration REST API",
       description:
-        "Dokumentasi API Terstandarisasi untuk Integrasi dan Penarikan Data dari Database Oracle SISMIOP PBB dan PostgreSQL BPHTB dengan Standar Keamanan SPLP (API Key, OAuth2 Bearer, SPLP Signature, mTLS).",
+        "Dokumentasi API Terbuka (Bebas Autentikasi / Tanpa X-API-Key) untuk Integrasi dan Penarikan Data dari Database Oracle SISMIOP PBB dan PostgreSQL BPHTB.",
       version: "1.0.0",
     },
-    components: {
-      securitySchemes: {
-        ApiKeyAuth: {
-          type: "apiKey",
-          in: "header",
-          name: "X-API-Key",
-          description: "API Key SPLP (Header X-API-Key atau Authorization: ApiKey <key>)",
-        },
-        BearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "OAuth2 Bearer Token didapatkan dari endpoint POST /api/v1/auth/token",
-        },
-        SPLPSignatureAuth: {
-          type: "apiKey",
-          in: "header",
-          name: "X-Signature",
-          description: "Header SPLP HMAC-SHA256: X-Client-Id, X-Timestamp, X-Signature",
-        },
-      },
-    },
-    security: [
-      { ApiKeyAuth: [] },
-      { BearerAuth: [] },
-      { SPLPSignatureAuth: [] },
-    ],
     paths: {
-      "/api/v1/auth/token": {
-        post: {
-          summary: "Mendapatkan Access Token OAuth2 (SPLP Client Credentials)",
-          security: [],
-          requestBody: {
-            required: true,
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    client_id: { type: "string", example: "bpn_splp_client" },
-                    client_secret: { type: "string", example: "bpn_splp_secret_key_2026" },
-                    grant_type: { type: "string", example: "client_credentials" },
-                  },
-                  required: ["client_id", "client_secret"],
-                },
-              },
+      "/api/v1/pbb/nop/{nop}": {
+        get: {
+          summary: "Detail Objek Pajak & Subjek Pajak berdasarkan NOP (Oracle SISMIOP)",
+          parameters: [
+            {
+              name: "nop",
+              in: "path",
+              required: true,
+              schema: { type: "string", example: "120301005600400580" },
+              description: "Nomor Objek Pajak (18 Digit Angka)",
             },
-          },
+          ],
           responses: {
             "200": {
-              description: "Token berhasil diterbitkan",
+              description: "Data Objek Pajak berhasil ditemukan",
               content: {
                 "application/json": {
                   schema: {
                     type: "object",
                     properties: {
                       status: { type: "string", example: "SUCCESS" },
-                      token_type: { type: "string", example: "Bearer" },
-                      access_token: { type: "string", example: "eyJhbGciOiJIUzI1Ni..." },
-                      expires_in: { type: "integer", example: 3600 },
+                      statusCode: { type: "integer", example: 200 },
+                      message: { type: "string", example: "Data Objek Pajak berhasil ditemukan." },
+                      data: {
+                        type: "object",
+                        properties: {
+                          nop: { type: "string", example: "12.03.010.056.004-0058.0" },
+                          nop_raw: { type: "string", example: "120301005600400580" },
+                          nm_wp: { type: "string", example: "NURHASANAH NASUTION" },
+                          alamat_op: { type: "string", example: "JL.LINTAS SUMATERA" },
+                          kecamatan_op: { type: "string", example: "KEC.BATANG ANGKOLA" },
+                          kelurahan_op: { type: "string", example: "SORIK" },
+                          kota_op: { type: "string", example: "-" },
+                          luastanah_op: { type: "number", example: 157 },
+                          luasbangunan_op: { type: "number", example: 64 },
+                          njop_tanah_op: { type: "number", example: 12560000 },
+                          njop_bangunan_op: { type: "number", example: 45000000 },
+                          status_tunggakan: { type: "string", example: "-" },
+                        },
+                      },
                     },
                   },
                 },
               },
             },
-            "401": { description: "Kredensial client tidak valid" },
-          },
-        },
-      },
-      "/api/v1/pbb/nop/{nop}": {
-        get: {
-          summary: "Detail Objek Pajak berdasarkan NOP",
-          parameters: [
-            {
-              name: "nop",
-              in: "path",
-              required: true,
-              schema: { type: "string", example: "120301005600400580" },
-            },
-          ],
-          responses: {
-            "200": { description: "Data berhasil ditemukan" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+            "400": { description: "Format NOP tidak valid (harus 18 digit)" },
+            "404": { description: "Data NOP tidak ditemukan di basis data" },
           },
         },
       },
       "/api/v1/pbb/sppt/{nop}": {
         get: {
-          summary: "Riwayat SPPT & Ketetapan PBB berdasarkan NOP",
+          summary: "Riwayat SPPT & Ketetapan PBB berdasarkan NOP (Oracle SISMIOP)",
           parameters: [
             {
               name: "nop",
               in: "path",
               required: true,
               schema: { type: "string", example: "120301005600400580" },
+              description: "Nomor Objek Pajak (18 Digit)",
             },
           ],
           responses: {
-            "200": { description: "Data SPPT berhasil ditemukan" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+            "200": {
+              description: "Data SPPT berhasil ditemukan",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      status: { type: "string", example: "SUCCESS" },
+                      statusCode: { type: "integer", example: 200 },
+                      total_records: { type: "integer", example: 5 },
+                      data: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            thn_pajak_sppt: { type: "string", example: "2026" },
+                            pbb_yg_harus_dibayar_sppt: { type: "number", example: 75000 },
+                            status_pembayaran_sppt: { type: "string", example: "1" },
+                            tgl_pembayaran_sppt: { type: "string", example: "2026-03-15" },
+                            luas_bumi_sppt: { type: "number", example: 157 },
+                            luas_bng_sppt: { type: "number", example: 64 },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            "400": { description: "Format NOP tidak valid" },
           },
         },
       },
@@ -124,14 +118,35 @@ export async function GET() {
             },
           ],
           responses: {
-            "200": { description: "Data ZNT berhasil ditemukan" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+            "200": {
+              description: "Data ZNT berhasil ditemukan",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      status: { type: "string", example: "SUCCESS" },
+                      statusCode: { type: "integer", example: 200 },
+                      data: {
+                        type: "object",
+                        properties: {
+                          nop: { type: "string" },
+                          kd_znt: { type: "string", example: "AA" },
+                          nir: { type: "number", example: 80000 },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            "400": { description: "Format NOP tidak valid" },
           },
         },
       },
       "/api/v1/pbb/znt": {
         get: {
-          summary: "Daftar Zona Nilai Tanah (ZNT) Master per Wilayah / Filter",
+          summary: "Daftar Master Zona Nilai Tanah (ZNT) per Wilayah",
           parameters: [
             { name: "kd_kecamatan", in: "query", schema: { type: "string" } },
             { name: "kd_kelurahan", in: "query", schema: { type: "string" } },
@@ -140,7 +155,6 @@ export async function GET() {
           ],
           responses: {
             "200": { description: "Daftar ZNT berhasil ditemukan" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
           },
         },
       },
@@ -165,15 +179,35 @@ export async function GET() {
             },
           },
           responses: {
-            "200": { description: "Validasi berhasil diproses" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+            "200": {
+              description: "Validasi komparasi bidang tanah berhasil diproses",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      status: { type: "string", example: "SUCCESS" },
+                      statusCode: { type: "integer", example: 200 },
+                      validation_result: {
+                        type: "object",
+                        properties: {
+                          is_valid: { type: "boolean", example: true },
+                          luas_match: { type: "boolean", example: true },
+                          selisih_luas: { type: "number", example: 0 },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            "400": { description: "Parameter NOP wajib disertakan" },
           },
         },
       },
       "/api/v1/bphtb/inquiry": {
         post: {
-          summary: "Inquiry Data Status & Pembayaran BPHTB (PostgreSQL - Tanpa API Key)",
-          security: [],
+          summary: "Inquiry Data Status & Pembayaran BPHTB (PostgreSQL)",
           requestBody: {
             required: true,
             content: {
@@ -228,8 +262,7 @@ export async function GET() {
           },
         },
         get: {
-          summary: "Inquiry Data Status & Pembayaran BPHTB via Query Params (Tanpa API Key)",
-          security: [],
+          summary: "Inquiry Data Status & Pembayaran BPHTB via Query Params",
           parameters: [
             {
               name: "nop",
