@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest) {
   if (
     path === "/api/v1/auth/token" ||
     path.startsWith("/api/v1/docs") ||
+    path.startsWith("/api/v1/bphtb") ||
     !path.startsWith("/api/v1/")
   ) {
     return NextResponse.next();

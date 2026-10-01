@@ -172,7 +172,8 @@ export async function GET() {
       },
       "/api/v1/bphtb/inquiry": {
         post: {
-          summary: "Inquiry Data Status & Pembayaran BPHTB (PostgreSQL)",
+          summary: "Inquiry Data Status & Pembayaran BPHTB (PostgreSQL - Tanpa API Key)",
+          security: [],
           requestBody: {
             required: true,
             content: {
@@ -196,11 +197,9 @@ export async function GET() {
                   schema: {
                     type: "object",
                     properties: {
-                      respon_code: { type: "string", example: "OK" },
-                      status: { type: "string", example: "SUCCESS" },
-                      statusCode: { type: "integer", example: 200 },
                       result: {
                         type: "object",
+                        nullable: true,
                         properties: {
                           NOP: { type: "string" },
                           NIK: { type: "string" },
@@ -218,18 +217,19 @@ export async function GET() {
                           JENISBAYAR: { type: "string", example: "L" },
                         },
                       },
+                      message: { type: "string", nullable: true },
                     },
                   },
                 },
               },
             },
             "400": { description: "Parameter NOP / NTPD tidak lengkap" },
-            "404": { description: "Data BPHTB tidak ditemukan" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+            "500": { description: "Terjadi kesalahan koneksi basis data" },
           },
         },
         get: {
-          summary: "Inquiry Data Status & Pembayaran BPHTB via Query Params",
+          summary: "Inquiry Data Status & Pembayaran BPHTB via Query Params (Tanpa API Key)",
+          security: [],
           parameters: [
             {
               name: "nop",
@@ -246,7 +246,8 @@ export async function GET() {
           ],
           responses: {
             "200": { description: "Data BPHTB berhasil ditemukan" },
-            "401": { description: "Unauthorized / Kredensial SPLP tidak valid" },
+            "400": { description: "Parameter query NOP / NTPD tidak lengkap" },
+            "500": { description: "Terjadi kesalahan koneksi basis data" },
           },
         },
       },
