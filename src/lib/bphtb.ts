@@ -15,19 +15,19 @@ interface TunnelInfo {
 
 function cleanupTunnel() {
   if (pool) {
-    pool.end().catch(() => {});
+    pool.end().catch(() => { });
     pool = null;
   }
   if (tunnelServer) {
     try {
       tunnelServer.close();
-    } catch (_) {}
+    } catch (_) { }
     tunnelServer = null;
   }
   if (sshClient) {
     try {
       sshClient.end();
-    } catch (_) {}
+    } catch (_) { }
     sshClient = null;
   }
   activeTunnelPort = null;
@@ -204,9 +204,9 @@ export interface BphtbQueryResult {
   KELURAHAN_OP: string;
   KECAMATAN_OP: string;
   KOTA_OP: string;
-  LUASTANAH: number | string;
-  LUASBANGUNAN: number | string;
-  PEMBAYARAN: number | string;
+  LUASTANAH: number;
+  LUASBANGUNAN: number;
+  PEMBAYARAN: number;
   STATUS: string;
   TANGGAL_PEMBAYARAN: string;
   NTPD: string;
@@ -283,9 +283,9 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
       KELURAHAN_OP: row.kelurahan_op ?? "",
       KECAMATAN_OP: row.kecamatan_op ?? "",
       KOTA_OP: row.kota_op ?? "",
-      LUASTANAH: row.luas_bumi ?? 0,
-      LUASBANGUNAN: row.luas_bangunan ?? 0,
-      PEMBAYARAN: row.nilai_belum_dibayar ?? 0,
+      LUASTANAH: Number(row.luas_bumi ?? 0),
+      LUASBANGUNAN: Number(row.luas_bangunan ?? 0),
+      PEMBAYARAN: Number(row.nilai_belum_dibayar ?? 0),
       STATUS: "",
       TANGGAL_PEMBAYARAN: "",
       NTPD: row.no_sts ?? cleanNtpd,
