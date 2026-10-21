@@ -285,7 +285,7 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
       KOTA_OP: row.kota_op ?? "",
       LUASTANAH: Number(row.luas_bumi ?? 0),
       LUASBANGUNAN: Number(row.luas_bangunan ?? 0),
-      PEMBAYARAN: Number(row.nilai_belum_dibayar ?? 0),
+      PEMBAYARAN: Number(row.bphtb ?? 0),
       STATUS: "",
       TANGGAL_PEMBAYARAN: "",
       NTPD: row.no_sts ?? cleanNtpd,
