@@ -269,6 +269,7 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
     if (res.rows.length === 0) {
       return {
         result: null,
+        message: "Data tidak ditemukan",
       };
     }
 
