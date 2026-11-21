@@ -85,11 +85,13 @@ export default function Home() {
     }
   };
 
-  const handleTestApi = async (type: string) => {
+  const handleTestApi = async (type: string, overrideNop?: string, overrideNtpd?: string) => {
     setLoading(true);
     setApiResponse(null);
     setResponseTime(null);
     const start = performance.now();
+    const activeNop = overrideNop ?? testNop;
+    const activeNtpd = overrideNtpd ?? testNtpd;
 
     try {
       if (type === "token") {
@@ -97,7 +99,7 @@ export default function Home() {
         return;
       }
 
-      let url = `/api/v1/pbb/nop/${testNop}`;
+      let url = `/api/v1/pbb/nop/${activeNop}`;
       let options: RequestInit = { method: "GET", headers: {} };
 
       const headers: Record<string, string> = {
@@ -111,15 +113,15 @@ export default function Home() {
       }
 
       if (type === "sppt") {
-        url = `/api/v1/pbb/sppt/${testNop}`;
+        url = `/api/v1/pbb/sppt/${activeNop}`;
       } else if (type === "znt") {
-        url = `/api/v1/pbb/znt/${testNop}`;
+        url = `/api/v1/pbb/znt/${activeNop}`;
       } else if (type === "bpn") {
         url = `/api/v1/pbb/bpn-validasi`;
         options = {
           method: "POST",
           body: JSON.stringify({
-            nop: testNop,
+            nop: activeNop,
             nib: nib,
             nomor_hak: nomorHak,
             luas_tanah_bpn: Number(luasTanahBpn) || 0,
@@ -130,8 +132,8 @@ export default function Home() {
         options = {
           method: "POST",
           body: JSON.stringify({
-            nop: testNop,
-            ntpd: testNtpd,
+            nop: activeNop,
+            ntpd: activeNtpd,
           }),
         };
       }
@@ -549,6 +551,7 @@ print_r($data);`;
                       setActiveView("sandbox");
                       setTestNop("120310007200401690");
                       setTestNtpd("129641113012020090071");
+                      handleTestApi("bphtb", "120310007200401690", "129641113012020090071");
                     }}
                     className="text-blue-400 hover:text-blue-300 font-bold inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
                   >
@@ -663,35 +666,50 @@ print_r($data);`;
                     <label className="text-xs font-semibold text-slate-300">Pilih Layanan API:</label>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 bg-slate-950 p-1.5 rounded-2xl border border-slate-800 text-xs font-medium">
                       <button
-                        onClick={() => setActiveTab("nop")}
+                        onClick={() => {
+                          setActiveTab("nop");
+                          if (testNop === "120310007200401690") setTestNop("120301005600400580");
+                        }}
                         className={`py-2 rounded-xl transition-all ${activeTab === "nop" ? "bg-emerald-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
                           }`}
                       >
                         Detail NOP
                       </button>
                       <button
-                        onClick={() => setActiveTab("sppt")}
+                        onClick={() => {
+                          setActiveTab("sppt");
+                          if (testNop === "120310007200401690") setTestNop("120301005600400580");
+                        }}
                         className={`py-2 rounded-xl transition-all ${activeTab === "sppt" ? "bg-emerald-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
                           }`}
                       >
                         SPPT
                       </button>
                       <button
-                        onClick={() => setActiveTab("znt")}
+                        onClick={() => {
+                          setActiveTab("znt");
+                          if (testNop === "120310007200401690") setTestNop("120301005600400580");
+                        }}
                         className={`py-2 rounded-xl transition-all ${activeTab === "znt" ? "bg-amber-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
                           }`}
                       >
                         ZNT & NIR
                       </button>
                       <button
-                        onClick={() => setActiveTab("bpn")}
+                        onClick={() => {
+                          setActiveTab("bpn");
+                          if (testNop === "120310007200401690") setTestNop("120301005600400580");
+                        }}
                         className={`py-2 rounded-xl transition-all ${activeTab === "bpn" ? "bg-cyan-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
                           }`}
                       >
                         Validasi BPN
                       </button>
                       <button
-                        onClick={() => setActiveTab("bphtb")}
+                        onClick={() => {
+                          setActiveTab("bphtb");
+                          if (testNop === "120301005600400580") setTestNop("120310007200401690");
+                        }}
                         className={`py-2 rounded-xl transition-all ${activeTab === "bphtb" ? "bg-blue-500 text-slate-950 font-bold shadow" : "text-slate-400 hover:text-slate-200"
                           }`}
                       >
