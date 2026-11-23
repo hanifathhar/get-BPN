@@ -8,12 +8,14 @@ function runRemoteCommand(cmd) {
       sshTarget.exec(cmd, (err, execStream) => {
         if (err) {
           sshTarget.end();
+          sshTarget.destroy();
           return reject(err);
         }
         let stdout = '';
         let stderr = '';
         execStream.on('close', (code, signal) => {
           sshTarget.end();
+          sshTarget.destroy();
           resolve({ code, stdout, stderr });
         });
         execStream.on('data', (d) => {
@@ -44,11 +46,15 @@ if (require.main === module) {
   if (command === '--sync') {
     const bphtbB64 = fs.readFileSync('src/lib/bphtb.ts').toString('base64');
     const pageB64 = fs.readFileSync('src/app/page.tsx').toString('base64');
+    const serviceB64 = fs.readFileSync('src/app/api/v1/bphtb/getBPHTBService/route.ts').toString('base64');
+    const inquiryB64 = fs.readFileSync('src/app/api/v1/bphtb/inquiry/route.ts').toString('base64');
     const envB64 = fs.readFileSync('.env').toString('base64');
     command = [
       'cd /home/hnf/get-BPN',
       `echo '${bphtbB64}' | base64 -d > src/lib/bphtb.ts`,
       `echo '${pageB64}' | base64 -d > src/app/page.tsx`,
+      `echo '${serviceB64}' | base64 -d > src/app/api/v1/bphtb/getBPHTBService/route.ts`,
+      `echo '${inquiryB64}' | base64 -d > src/app/api/v1/bphtb/inquiry/route.ts`,
       `echo '${envB64}' | base64 -d > .env`,
       'npm run build',
       'pm2 restart get-bpn-api --update-env',

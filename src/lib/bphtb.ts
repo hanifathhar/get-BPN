@@ -234,14 +234,17 @@ export interface BphtbQueryResult {
   LUASBANGUNAN: number;
   PEMBAYARAN: number;
   STATUS: string;
+  TANGGAL_PERMOHONAN: string;
+  TANGGAL_KODEBILLING: string;
   TANGGAL_PEMBAYARAN: string;
+  TANGGAL_VALIDASI: string;
   NTPD: string;
   JENISBAYAR: string;
 }
 
 export interface BphtbResponse {
-  result: BphtbQueryResult | null;
-  message?: string;
+  result?: BphtbQueryResult | null;
+  respon_code?: string;
 }
 
 /**
@@ -266,10 +269,21 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
   const cleanNop = (nop || "").trim();
   const cleanNtpd = (ntpd || "").trim();
 
-  if (!cleanNop || !cleanNtpd) {
+  if (!cleanNop && !cleanNtpd) {
     return {
-      result: null,
-      message: "Parameter NOP dan NTPD (No STS) wajib diisi.",
+      respon_code: "Data tidak ditemukan",
+    };
+  }
+
+  if (!cleanNop) {
+    return {
+      respon_code: "NOP tidak ditemukan",
+    };
+  }
+
+  if (!cleanNtpd) {
+    return {
+      respon_code: "NTPD tidak ditemukan",
     };
   }
 
@@ -292,43 +306,70 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
     const res = await client.query(query, [cleanNop, cleanNtpd]);
 
     if (res.rows.length === 0) {
+      const checkQuery = `
+        SELECT
+          EXISTS(
+            SELECT 1 FROM tbl_bphtb
+            WHERE nop = $1 OR REPLACE(REPLACE(nop, '.', ''), '-', '') = $1
+          ) AS nop_exists,
+          EXISTS(
+            SELECT 1 FROM tbl_bphtb
+            WHERE no_sts = $2 OR CAST(no_sts AS VARCHAR) = $2
+          ) AS ntpd_exists
+      `;
+      const checkRes = await client.query(checkQuery, [cleanNop, cleanNtpd]);
+      const nopExists = Boolean(checkRes.rows[0]?.nop_exists);
+      const ntpdExists = Boolean(checkRes.rows[0]?.ntpd_exists);
+
+      if (!nopExists && ntpdExists) {
+        return {
+          respon_code: "NOP tidak ditemukan",
+        };
+      }
+
+      if (nopExists && !ntpdExists) {
+        return {
+          respon_code: "NTPD tidak ditemukan",
+        };
+      }
+
       return {
-        result: null,
-        message: "Data tidak ditemukan",
+        respon_code: "Data tidak ditemukan",
       };
     }
 
     const row = res.rows[0];
     const nilaiBelumDibayar = Number(row.nilai_belum_dibayar ?? 0);
 
-    const formattedResult: BphtbQueryResult = {
-      NOP: row.nop ?? cleanNop,
-      NIK: row.nik ?? "",
-      NAMA: row.nama_wp_baru ?? row.nama_wp ?? "",
-      ALAMAT: row.alamat_wp_baru ?? row.alamat_wp ?? row.lokasi_op ?? "",
-      KELURAHAN_OP: row.kelurahan_op ?? "",
-      KECAMATAN_OP: row.kecamatan_op ?? "",
-      KOTA_OP: row.kota_op ?? "",
-      LUASTANAH: Number(row.luas_bumi ?? 0),
-      LUASBANGUNAN: Number(row.luas_bangunan ?? 0),
-      PEMBAYARAN: Number(row.bphtb ?? 0),
-      STATUS: "",
-      TANGGAL_PEMBAYARAN: "",
-      NTPD: row.no_sts ?? cleanNtpd,
-      JENISBAYAR: "",
-    };
+    const tglPermohonan = formatDate(row.tgl_berkas || row.tgl_entry || row.tgl_skp || row.tgl_bayar);
+    const tglKodeBilling = formatDate(row.tgl_skp || row.tgl_berkas || row.tgl_entry);
+    const tglPembayaran =
+      nilaiBelumDibayar < 1
+        ? formatDate(row.tgl_bayar || row.tgl_skp)
+        : formatDate(row.tgl_bayar);
+    const tglValidasi = formatDate(
+      row.tgl_verif3 || row.tgl_verif2 || row.tgl_verif1 || row.tgl_skp || row.tgl_bayar
+    );
 
-    if (nilaiBelumDibayar < 1) {
-      formattedResult.STATUS = "Y";
-      formattedResult.TANGGAL_PEMBAYARAN = formatDate(row.tgl_skp);
-      formattedResult.NTPD = row.no_sts ?? cleanNtpd;
-      formattedResult.JENISBAYAR = "L";
-    } else {
-      formattedResult.STATUS = row.status ?? "T";
-      formattedResult.TANGGAL_PEMBAYARAN = formatDate(row.tgl_bayar);
-      formattedResult.NTPD = row.no_sts ?? cleanNtpd;
-      formattedResult.JENISBAYAR = row.jenisbayar ?? "H";
-    }
+    const formattedResult: BphtbQueryResult = {
+      NOP: String(row.nop ?? cleanNop),
+      NIK: String(row.nik_wp_baru || row.nik_wp || row.nik || ""),
+      NAMA: String(row.nama_wp_baru ?? row.nama_wp ?? ""),
+      ALAMAT: String(row.alamat_wp_baru ?? row.alamat_wp ?? row.lokasi_op ?? ""),
+      KELURAHAN_OP: String(row.kelurahan_op ?? ""),
+      KECAMATAN_OP: String(row.kecamatan_op ?? ""),
+      KOTA_OP: String(row.kota_op ?? ""),
+      LUASTANAH: Math.round(Number(row.luas_bumi ?? 0)),
+      LUASBANGUNAN: Math.round(Number(row.luas_bangunan ?? 0)),
+      PEMBAYARAN: Math.round(Number(row.bphtb ?? 0)),
+      STATUS: nilaiBelumDibayar < 1 ? "Y" : String(row.status ?? "T"),
+      TANGGAL_PERMOHONAN: tglPermohonan,
+      TANGGAL_KODEBILLING: tglKodeBilling,
+      TANGGAL_PEMBAYARAN: tglPembayaran,
+      TANGGAL_VALIDASI: tglValidasi,
+      NTPD: String(row.no_sts ?? cleanNtpd),
+      JENISBAYAR: nilaiBelumDibayar < 1 ? "L" : String(row.jenisbayar ?? "H"),
+    };
 
     return {
       result: formattedResult,
@@ -346,12 +387,11 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
       error.code === "ECONNREFUSED" ||
       error.code === "EHOSTUNREACH"
     ) {
-      customMessage = `Gagal terhubung ke Database PostgreSQL BPHTB (${process.env.BPHTB_DB_HOST || "192.168.1.101"}:5432). Periksa koneksi SSH Tunnel Tailscale ke ${process.env.BPHTB_SSH_HOST || "100.108.177.13"}:${process.env.BPHTB_SSH_PORT || "2201"}.`;
+      customMessage = "Gagal terhubung ke Database PostgreSQL BPHTB. Silakan periksa koneksi server basis data.";
     }
 
     return {
-      result: null,
-      message: customMessage,
+      respon_code: customMessage,
     };
   } finally {
     if (client) {

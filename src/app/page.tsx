@@ -185,12 +185,12 @@ export default function Home() {
 
     if (lang === "curl") {
       if (method === "GET") {
-        return `curl -X GET "http://103.167.12.53:3005${endpointPath}" \\\n  -H "Accept: application/json"${authHeader ? ` \\\n  -H "${authHeader}"` : ""}`;
+        return `curl -X GET "${endpointPath}" \\\n  -H "Accept: application/json"${authHeader ? ` \\\n  -H "${authHeader}"` : ""}`;
       } else {
-        return `curl -X POST "http://103.167.12.53:3005${endpointPath}" \\\n  -H "Content-Type: application/json"${authHeader ? ` \\\n  -H "${authHeader}"` : ""} \\\n  -d '${bodyJson.replace(/\n/g, "")}'`;
+        return `curl -X POST "${endpointPath}" \\\n  -H "Content-Type: application/json"${authHeader ? ` \\\n  -H "${authHeader}"` : ""} \\\n  -d '${bodyJson.replace(/\n/g, "")}'`;
       }
     } else if (lang === "fetch") {
-      return `const response = await fetch("http://103.167.12.53:3005${endpointPath}", {
+      return `const response = await fetch("${endpointPath}", {
   method: "${method}",
   headers: {
     "Content-Type": "application/json",${authHeader ? `\n    "${authHeader.split(": ")[0]}": "${authHeader.split(": ")[1]}"` : ""}
@@ -201,7 +201,7 @@ console.log(data);`;
     } else if (lang === "python") {
       return `import requests
 
-url = "http://103.167.12.53:3005${endpointPath}"
+url = "${endpointPath}"
 headers = {
     "Content-Type": "application/json"${authHeader ? `,\n    "${authHeader.split(": ")[0]}": "${authHeader.split(": ")[1]}"` : ""}
 }
@@ -212,10 +212,10 @@ print(response.json())`;
     } else if (lang === "php") {
       return `<?php
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "http://103.167.12.53:3005${endpointPath}");
+curl_setopt($ch, CURLOPT_URL, "${endpointPath}");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Content-Type: application/json"${authHeader ? `,\n    "${authHeader}"` : ""}
+    "Content-Type": "application/json"${authHeader ? `,\n    "${authHeader}"` : ""}
 ]);
 ${method === "POST" ? `curl_setopt($ch, CURLOPT_POST, true);\ncurl_setopt($ch, CURLOPT_POSTFIELDS, '${bodyJson.replace(/\n/g, "")}');` : ""}
 
@@ -350,9 +350,9 @@ print_r($data);`;
                     </span>
                   </div>
                   <button
-                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/auth/token", "token")}
+                    onClick={() => copyToClipboard("/api/v1/auth/token", "token")}
                     className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Copy Full URL"
+                    title="Copy Endpoint"
                   >
                     {copiedEndpoint === "token" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -386,9 +386,9 @@ print_r($data);`;
                     </span>
                   </div>
                   <button
-                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/pbb/nop/120301005600400580", "nop")}
+                    onClick={() => copyToClipboard("/api/v1/pbb/nop/120301005600400580", "nop")}
                     className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Copy Full URL"
+                    title="Copy Endpoint"
                   >
                     {copiedEndpoint === "nop" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -422,9 +422,9 @@ print_r($data);`;
                     </span>
                   </div>
                   <button
-                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/pbb/sppt/120301005600400580", "sppt")}
+                    onClick={() => copyToClipboard("/api/v1/pbb/sppt/120301005600400580", "sppt")}
                     className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Copy Full URL"
+                    title="Copy Endpoint"
                   >
                     {copiedEndpoint === "sppt" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -458,9 +458,9 @@ print_r($data);`;
                     </span>
                   </div>
                   <button
-                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/pbb/znt/120301005600400580", "znt")}
+                    onClick={() => copyToClipboard("/api/v1/pbb/znt/120301005600400580", "znt")}
                     className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Copy Full URL"
+                    title="Copy Endpoint"
                   >
                     {copiedEndpoint === "znt" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -494,9 +494,9 @@ print_r($data);`;
                     </span>
                   </div>
                   <button
-                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/pbb/bpn-validasi", "bpn")}
+                    onClick={() => copyToClipboard("/api/v1/pbb/bpn-validasi", "bpn")}
                     className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Copy Full URL"
+                    title="Copy Endpoint"
                   >
                     {copiedEndpoint === "bpn" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -533,9 +533,9 @@ print_r($data);`;
                     </span>
                   </div>
                   <button
-                    onClick={() => copyToClipboard("http://103.167.12.53:3005/api/v1/bphtb/inquiry", "bphtb")}
+                    onClick={() => copyToClipboard("/api/v1/bphtb/inquiry", "bphtb")}
                     className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Copy Full URL"
+                    title="Copy Endpoint"
                   >
                     {copiedEndpoint === "bphtb" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -1036,9 +1036,15 @@ print_r($data);`;
                             </span>
                           </div>
                           <div>
-                            <span className="text-slate-500 block">Tanggal Pembayaran / SKP:</span>
+                            <span className="text-slate-500 block">Tanggal Permohonan / Billing:</span>
                             <span className="font-semibold text-white">
-                              {apiResponse.result?.TANGGAL_PEMBAYARAN || apiResponse.data?.TANGGAL_PEMBAYARAN || "-"}
+                              {apiResponse.result?.TANGGAL_PERMOHONAN || "-"} / {apiResponse.result?.TANGGAL_KODEBILLING || "-"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Tanggal Pembayaran / Validasi:</span>
+                            <span className="font-semibold text-white">
+                              {apiResponse.result?.TANGGAL_PEMBAYARAN || apiResponse.data?.TANGGAL_PEMBAYARAN || "-"} / {apiResponse.result?.TANGGAL_VALIDASI || "-"}
                             </span>
                           </div>
                           <div>
