@@ -341,15 +341,10 @@ export async function queryBphtb(nop: string, ntpd: string): Promise<BphtbRespon
     const row = res.rows[0];
     const nilaiBelumDibayar = Number(row.nilai_belum_dibayar ?? 0);
 
-    const tglPermohonan = formatDate(row.tgl_berkas || row.tgl_entry || row.tgl_skp || row.tgl_bayar);
-    const tglKodeBilling = formatDate(row.tgl_skp || row.tgl_berkas || row.tgl_entry);
-    const tglPembayaran =
-      nilaiBelumDibayar < 1
-        ? formatDate(row.tgl_bayar || row.tgl_skp)
-        : formatDate(row.tgl_bayar);
-    const tglValidasi = formatDate(
-      row.tgl_verif3 || row.tgl_verif2 || row.tgl_verif1 || row.tgl_skp || row.tgl_bayar
-    );
+    const tglPermohonan = formatDate(row.tgl_berkas);
+    const tglKodeBilling = formatDate(row.tgl_tetap ?? row.tgl_skp);
+    const tglPembayaran = formatDate(row.tgl_bayar);
+    const tglValidasi = formatDate(row.tgl_tetap ?? row.tgl_skp);
 
     const formattedResult: BphtbQueryResult = {
       NOP: String(row.nop ?? cleanNop),
